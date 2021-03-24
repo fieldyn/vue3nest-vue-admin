@@ -21,6 +21,16 @@
       </tbody>
     </table>
   </div>
+  <nav>
+    <ul class="pagination">
+      <li class="page-item">
+        <a href="javascript:void(0)" class="page-link" @click="prev">Previous</a>
+      </li>
+      <li class="page-item">
+        <a href="javascript:void(0)" class="page-link" @click="next">Next</a>
+      </li>
+    </ul>
+  </nav>
 </template>
 
 <script lang="ts">
@@ -30,12 +40,34 @@ export default {
   name: "Users",
   setup() {
     const users = ref([]);
-    onMounted(async () => {
-      const { data } = await axios.get("users");
+    const page = ref(1);
+    const lastPage = ref(0);
+
+    const load = async () => {
+      const { data } = await axios.get(`users?page=${page.value}`);
       users.value = data.data;
-    });
+      lastPage.value = data.meta.last_page;
+    };
+
+    onMounted(load);
+
+    const next = () => {
+      if (page.value < lastPage.value) {
+        page.value++;
+        load();
+      }
+    };
+    const prev = () => {
+      if (page.value > 1) {
+        page.value--;
+        load();
+      }
+    };
+
     return {
       users,
+      next,
+      prev,
     };
   },
 };
