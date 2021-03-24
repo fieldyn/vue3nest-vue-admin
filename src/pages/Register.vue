@@ -16,6 +16,9 @@
 
 <script lang="ts">
 import { ref } from "@vue/reactivity";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
 export default {
   name: "Register",
   setup() {
@@ -24,15 +27,18 @@ export default {
     const email = ref("");
     const password = ref("");
     const passwordConfirm = ref("");
+    const router = useRouter();
 
-    const submit = () => {
-      console.log({
+    const submit = async () => {
+      const { data } = await axios.post("register", {
         first_name: firstName.value,
         last_name: lastName.value,
         email: email.value,
         password: password.value,
-        passwordConfirm: passwordConfirm.value,
+        password_confirm: passwordConfirm.value,
       });
+      console.log(data);
+      await router.push("/login");
     };
 
     return {
