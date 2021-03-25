@@ -1,4 +1,7 @@
 <template>
+  <div class="pt-3 pb-2 mb-3 border-bottom">
+    <router-link to="/users/create" class="btn btn-sm btn-outline-secondary">Add</router-link>
+  </div>
   <div class="table-responsive">
     <table class="table table-striped table-sm">
       <thead>
@@ -16,7 +19,11 @@
           <td>{{ user.first_name }} {{ user.last_name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role.name }}</td>
-          <td></td>
+          <td>
+            <div class="btn-group mr-2">
+              <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" @click="del(user.id)">Delete</a>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -35,7 +42,8 @@
 
 <script lang="ts">
 import axios from "axios";
-import { onMounted, ref } from "@vue/runtime-core";
+import { User } from "@/models/user";
+import { onMounted, ref, watch } from "@vue/runtime-core";
 export default {
   name: "Users",
   setup() {
@@ -51,16 +59,23 @@ export default {
 
     onMounted(load);
 
+    watch(page, load);
+
     const next = () => {
       if (page.value < lastPage.value) {
         page.value++;
-        load();
       }
     };
     const prev = () => {
       if (page.value > 1) {
         page.value--;
-        load();
+      }
+    };
+
+    const del = async (id: number) => {
+      if (confirm("Are you sure?")) {
+        await axios.delete(`users/${id}`);
+        users.value = users.value.filter((u: User) => u.id !== id);
       }
     };
 
@@ -68,6 +83,7 @@ export default {
       users,
       next,
       prev,
+      del,
     };
   },
 };
