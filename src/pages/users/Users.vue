@@ -33,49 +33,28 @@
       </tbody>
     </table>
   </div>
-  <nav>
-    <ul class="pagination">
-      <li class="page-item">
-        <a href="javascript:void(0)" class="page-link" @click="prev">Previous</a>
-      </li>
-      <li class="page-item">
-        <a href="javascript:void(0)" class="page-link" @click="next">Next</a>
-      </li>
-    </ul>
-  </nav>
+  <paginator :last-page="lastPage" @page-changed="load($event)" />
 </template>
 
 <script lang="ts">
 import axios from "axios";
 import { User } from "@/models/user";
-import { onMounted, ref, watch } from "@vue/runtime-core";
+import { onMounted, ref } from "@vue/runtime-core";
+import Paginator from "@/components/Paginator.vue";
 export default {
+  components: { Paginator },
   name: "Users",
   setup() {
     const users = ref([]);
-    const page = ref(1);
     const lastPage = ref(0);
 
-    const load = async () => {
-      const { data } = await axios.get(`users?page=${page.value}`);
+    const load = async (page = 1) => {
+      const { data } = await axios.get(`users?page=${page}`);
       users.value = data.data;
       lastPage.value = data.meta.last_page;
     };
 
     onMounted(load);
-
-    watch(page, load);
-
-    const next = () => {
-      if (page.value < lastPage.value) {
-        page.value++;
-      }
-    };
-    const prev = () => {
-      if (page.value > 1) {
-        page.value--;
-      }
-    };
 
     const del = async (id: number) => {
       if (confirm("Are you sure?")) {
@@ -86,9 +65,9 @@ export default {
 
     return {
       users,
-      next,
-      prev,
+      load,
       del,
+      lastPage,
     };
   },
 };
