@@ -22,31 +22,33 @@
             <td>{{ order.total }}</td>
             <td>
               <div class="btn-group mr-2">
-                <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary">View</a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary" @click="select(order.id)">View</a>
               </div>
             </td>
           </tr>
           <tr>
             <td colspan="5">
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Total</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in order.order_items" :key="item.id">
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.product_title }}</td>
-                    <td>{{ item.price }}</td>
-                    <td>{{ item.quantity }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="overflow-hidden" :class="selected === order.id ? 'show' : 'hide'">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Total</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in order.order_items" :key="item.id">
+                      <td>{{ item.id }}</td>
+                      <td>{{ item.product_title }}</td>
+                      <td>{{ item.price }}</td>
+                      <td>{{ item.quantity }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </td>
           </tr>
         </template>
@@ -66,6 +68,7 @@ export default {
   setup() {
     const orders = ref([]);
     const lastPage = ref(0);
+    const selected = ref(0);
 
     const load = async (page = 1) => {
       const { data } = await axios.get(`orders?page=${page}`);
@@ -74,9 +77,20 @@ export default {
     };
     onMounted(load);
 
-    return { orders, lastPage, load };
+    const select = (id: number) => (selected.value = selected.value !== id ? id : 0);
+
+    return { orders, lastPage, load, select, selected };
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="css" scoped>
+.show {
+  max-height: 150px;
+  transition: max-height 1000ms ease-in;
+}
+.hide {
+  max-height: 0px;
+  transition: max-height 1000ms ease-out;
+}
+</style>
