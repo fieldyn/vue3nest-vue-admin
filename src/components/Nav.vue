@@ -10,15 +10,18 @@
 
 <script lang="ts">
 import axios from "axios";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "Nav",
   setup() {
     const name = ref("");
-    onMounted(async () => {
-      const { data } = await axios.get("user");
-      name.value = data.first_name + " " + data.last_name;
+    const store = useStore();
+    const user = computed(() => store.state.User.user);
+
+    watch(user, () => {
+      name.value = user.value.first_name + " " + user.value.last_name;
     });
 
     const logout = async () => {

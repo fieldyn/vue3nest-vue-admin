@@ -16,15 +16,19 @@ import Nav from "@/components/Nav.vue";
 import axios from "axios";
 import { onMounted } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
   name: "Wrapper",
   components: { Menu, Nav },
   setup() {
     const router = useRouter();
+    const store = useStore();
+
     onMounted(async () => {
       try {
         const { data } = await axios.get("user");
-        console.log(data);
+
+        await store.dispatch("User/setUser", data);
       } catch (ex) {
         await router.push("/login");
       }
