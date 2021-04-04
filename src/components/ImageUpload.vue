@@ -8,7 +8,7 @@ import { SetupContext } from "@vue/runtime-core";
 export default {
   name: "ImageUpload",
   emits: ["uploaded"],
-  setup(_, context: SetupContext) {
+  setup(_: any, context: SetupContext) {
     const upload = async (files: FileList | null) => {
       if (files === null) return;
 
